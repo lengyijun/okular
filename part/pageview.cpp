@@ -2533,6 +2533,7 @@ void PageView::mousePressEvent(QMouseEvent *e)
 
 void PageView::mouseReleaseEvent(QMouseEvent *e)
 {
+    copyTextSelection();
     // stop the drag scrolling
     d->dragScrollTimer.stop();
 
@@ -3221,6 +3222,13 @@ void PageView::mouseDoubleClickEvent(QMouseEvent *e)
             }
         }
     }
+        const QString text = d->selectedText();
+        if (!text.isEmpty()) {
+            QClipboard *cb = QApplication::clipboard();
+            cb->setText(text, QClipboard::Clipboard);
+        }
+
+    // copyTextSelection();
 }
 
 void PageView::wheelEvent(QWheelEvent *e)
@@ -3781,6 +3789,14 @@ void PageView::updateSelection(const QPoint pos)
         }
         d->pagesWithTextSelection = pagesWithSelectionSet;
     }
+
+          const QString text = d->selectedText();
+        if (!text.isEmpty()) {
+            QClipboard *cb = QApplication::clipboard();
+            cb->setText(text, QClipboard::Clipboard);
+        }
+
+    // copyTextSelection();
 }
 
 static Okular::NormalizedPoint rotateInNormRect(const QPoint rotated, const QRect rect, Okular::Rotation rotation)
