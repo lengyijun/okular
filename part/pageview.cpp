@@ -99,6 +99,8 @@
 #include "url_utils.h"
 #include "videowidget.h"
 
+#include <iostream>
+
 static const int pageflags = PagePainter::Accessibility | PagePainter::EnhanceLinks | PagePainter::EnhanceImages | PagePainter::Highlights | PagePainter::TextSelection | PagePainter::Annotations;
 
 static const std::array<float, 16> kZoomValues {0.12, 0.25, 0.33, 0.50, 0.66, 0.75, 1.00, 1.25, 1.50, 2.00, 4.00, 8.00, 16.00, 25.00, 50.00, 100.00};
@@ -2562,6 +2564,7 @@ void PageView::mousePressEvent(QMouseEvent *e)
 
 void PageView::mouseReleaseEvent(QMouseEvent *e)
 {
+    copyTextSelection();
     // stop the drag scrolling
     d->dragScrollTimer.stop();
 
@@ -3251,6 +3254,13 @@ void PageView::mouseDoubleClickEvent(QMouseEvent *e)
             }
         }
     }
+        const QString text = d->selectedText();
+        if (!text.isEmpty()) {
+            QClipboard *cb = QApplication::clipboard();
+            cb->setText(text, QClipboard::Clipboard);
+        }
+
+    // copyTextSelection();
 }
 
 void PageView::wheelEvent(QWheelEvent *e)
@@ -3778,6 +3788,14 @@ void PageView::updateSelection(const QPoint pos)
         }
         d->pagesWithTextSelection = pagesWithSelectionSet;
     }
+
+          const QString text = d->selectedText();
+        if (!text.isEmpty()) {
+            QClipboard *cb = QApplication::clipboard();
+            cb->setText(text, QClipboard::Clipboard);
+        }
+
+    // copyTextSelection();
 }
 
 static Okular::NormalizedPoint rotateInNormRect(const QPoint rotated, const QRect rect, Okular::Rotation rotation)
